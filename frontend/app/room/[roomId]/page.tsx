@@ -14,9 +14,9 @@ const FIBONACCI_CARDS = ["0", "1", "2", "3", "5", "8", "13", "21", "?", "☕"];
 
 const THEMES = {
   dark: {
-    pageStyle:   { background: "linear-gradient(160deg,#0f0f10 0%,#111318 60%,#0d1020 100%)" },
-    headerStyle: { background: "rgba(10,10,12,0.80)", borderColor: "rgba(255,255,255,0.07)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#0d2d1a 0%,#061a0e 100%)", borderColor: "rgba(20,83,45,0.65)", boxShadow: "inset 0 2px 20px rgba(0,0,0,0.6)" },
+    pageStyle:   { background: "linear-gradient(160deg,#0d1628 0%,#0a1220 60%,#070e1a 100%)" },
+    headerStyle: { background: "rgba(8,14,26,0.85)", borderColor: "rgba(255,255,255,0.08)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#0d2d1a 0%,#061a0e 100%)", borderColor: "rgba(20,83,45,0.65)", boxShadow: "inset 0 2px 20px rgba(0,0,0,0.5)" },
   },
   light: {
     pageStyle:   { background: "linear-gradient(160deg,#f8f9fa 0%,#f1f5f9 60%,#e8ecf0 100%)" },
