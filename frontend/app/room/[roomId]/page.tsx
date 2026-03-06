@@ -509,7 +509,7 @@ export default function RoomPage() {
             {room.stats && (
               <div className="grid grid-cols-3 gap-4 text-center mb-6">
                 <div>
-                  <p className="text-3xl font-bold text-indigo-400">{room.stats.average}</p>
+                  <p className="text-3xl font-bold text-indigo-400">{Math.round(room.stats.average)}</p>
                   <p className="text-xs text-slate-400 mt-1">Average</p>
                 </div>
                 <div>
