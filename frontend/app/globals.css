@@ -11,30 +11,77 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* ── Light theme overrides ───────────────────────────────────────── */
-[data-theme="light"] .text-white        { color: #0f172a !important; }
-[data-theme="light"] .text-slate-100    { color: #1e293b !important; }
-[data-theme="light"] .text-slate-200    { color: #334155 !important; }
-[data-theme="light"] .text-slate-300    { color: #475569 !important; }
-[data-theme="light"] .text-slate-400    { color: #64748b !important; }
-[data-theme="light"] .text-slate-500    { color: #94a3b8 !important; }
-[data-theme="light"] .text-indigo-400   { color: #4f46e5 !important; }
-[data-theme="light"] .text-indigo-300   { color: #6366f1 !important; }
-[data-theme="light"] .text-green-400    { color: #16a34a !important; }
-[data-theme="light"] .text-red-400      { color: #dc2626 !important; }
-[data-theme="light"] .text-yellow-400   { color: #ca8a04 !important; }
+/* ══════════════════════════════════════════════════════════════════
+   LIGHT THEME — override all dark Tailwind classes
+   ══════════════════════════════════════════════════════════════════ */
 
-[data-theme="light"] .bg-white\/5       { background: rgba(0,0,0,0.04) !important; }
+/* ── Page / surface backgrounds ─────────────────────────────────── */
+[data-theme="light"] .bg-slate-900   { background-color: #f1f5f9 !important; }
+[data-theme="light"] .bg-slate-800   { background-color: #e2e8f0 !important; }
+[data-theme="light"] .bg-slate-700   { background-color: #cbd5e1 !important; }
+[data-theme="light"] .bg-slate-600   { background-color: #94a3b8 !important; }
+
+/* opacity variants */
+[data-theme="light"] .bg-slate-800\/80  { background-color: rgba(226,232,240,0.92) !important; }
+[data-theme="light"] .bg-slate-800\/30  { background-color: rgba(203,213,225,0.45) !important; }
+[data-theme="light"] .bg-slate-800\/20  { background-color: rgba(203,213,225,0.35) !important; }
+[data-theme="light"] .bg-slate-700\/80  { background-color: rgba(203,213,225,0.88) !important; }
+[data-theme="light"] .bg-slate-700\/60  { background-color: rgba(203,213,225,0.7)  !important; }
+[data-theme="light"] .bg-slate-700\/50  { background-color: rgba(203,213,225,0.65) !important; }
+[data-theme="light"] .bg-slate-600\/80  { background-color: rgba(148,163,184,0.85) !important; }
+[data-theme="light"] .bg-slate-700\/0   { background-color: transparent !important; }
+
+/* glassmorphism surfaces */
+[data-theme="light"] .bg-white\/5       { background: rgba(0,0,0,0.03) !important; }
 [data-theme="light"] .bg-white\/8       { background: rgba(0,0,0,0.05) !important; }
-[data-theme="light"] .bg-white\/12      { background: rgba(0,0,0,0.08) !important; }
-[data-theme="light"] .bg-indigo-500\/20 { background: rgba(99,102,241,0.15) !important; }
-[data-theme="light"] .bg-green-500\/10  { background: rgba(22,163,74,0.08) !important; }
+[data-theme="light"] .bg-white\/12      { background: rgba(0,0,0,0.07) !important; }
+[data-theme="light"] .bg-indigo-500\/20 { background: rgba(99,102,241,0.12) !important; }
+[data-theme="light"] .bg-green-500\/10  { background: rgba(22,163,74,0.08)  !important; }
+[data-theme="light"] .bg-green-900\/40  { background: rgba(20,83,45,0.12)   !important; }
+[data-theme="light"] .bg-green-900\/60  { background: rgba(20,83,45,0.18)   !important; }
+[data-theme="light"] .bg-indigo-900\/20 { background: rgba(49,46,129,0.1)   !important; }
 
-[data-theme="light"] .border-white\/10  { border-color: rgba(0,0,0,0.1) !important; }
-[data-theme="light"] .border-white\/20  { border-color: rgba(0,0,0,0.15) !important; }
-[data-theme="light"] .border-white\/30  { border-color: rgba(0,0,0,0.22) !important; }
-[data-theme="light"] .border-indigo-400\/50 { border-color: rgba(99,102,241,0.5) !important; }
-[data-theme="light"] .border-green-500\/30  { border-color: rgba(22,163,74,0.3) !important; }
+/* ── Borders ─────────────────────────────────────────────────────── */
+[data-theme="light"] .border-slate-700     { border-color: #cbd5e1 !important; }
+[data-theme="light"] .border-slate-600     { border-color: #94a3b8 !important; }
+[data-theme="light"] .border-slate-500     { border-color: #64748b !important; }
+[data-theme="light"] .border-white\/10     { border-color: rgba(0,0,0,0.09) !important; }
+[data-theme="light"] .border-white\/20     { border-color: rgba(0,0,0,0.13) !important; }
+[data-theme="light"] .border-white\/30     { border-color: rgba(0,0,0,0.18) !important; }
+[data-theme="light"] .border-indigo-400\/50   { border-color: rgba(99,102,241,0.5)  !important; }
+[data-theme="light"] .border-indigo-700\/40   { border-color: rgba(67,56,202,0.4)   !important; }
+[data-theme="light"] .border-green-500\/30    { border-color: rgba(22,163,74,0.3)   !important; }
+[data-theme="light"] .border-indigo-500\/40   { border-color: rgba(99,102,241,0.4)  !important; }
 
-[data-theme="light"] .bg-indigo-600 { background: #4f46e5 !important; }
+/* ── Text colors ─────────────────────────────────────────────────── */
+[data-theme="light"] .text-white         { color: #0f172a !important; }
+[data-theme="light"] .text-slate-100     { color: #1e293b !important; }
+[data-theme="light"] .text-slate-200     { color: #1e293b !important; }
+[data-theme="light"] .text-slate-300     { color: #334155 !important; }
+[data-theme="light"] .text-slate-400     { color: #64748b !important; }
+[data-theme="light"] .text-slate-500     { color: #94a3b8 !important; }
+[data-theme="light"] .text-slate-600     { color: #475569 !important; }
+[data-theme="light"] .text-indigo-400    { color: #4f46e5 !important; }
+[data-theme="light"] .text-indigo-300    { color: #6366f1 !important; }
+[data-theme="light"] .text-green-400     { color: #16a34a !important; }
+[data-theme="light"] .text-green-300     { color: #15803d !important; }
+[data-theme="light"] .text-red-400       { color: #dc2626 !important; }
+[data-theme="light"] .text-yellow-400    { color: #ca8a04 !important; }
+
+/* ── Hover states ────────────────────────────────────────────────── */
+[data-theme="light"] .hover\:bg-slate-700:hover       { background-color: #cbd5e1 !important; }
+[data-theme="light"] .hover\:bg-slate-700\/50:hover   { background-color: rgba(203,213,225,0.7) !important; }
+[data-theme="light"] .hover\:bg-slate-600:hover       { background-color: #94a3b8 !important; }
+[data-theme="light"] .hover\:bg-slate-600\/80:hover   { background-color: rgba(148,163,184,0.9) !important; }
+[data-theme="light"] .hover\:text-white:hover         { color: #0f172a !important; }
+[data-theme="light"] .hover\:text-slate-300:hover     { color: #334155 !important; }
+[data-theme="light"] .hover\:border-slate-600:hover   { border-color: #94a3b8 !important; }
+[data-theme="light"] .hover\:bg-white\/10:hover       { background: rgba(0,0,0,0.07) !important; }
+[data-theme="light"] .hover\:border-indigo-500:hover  { border-color: #6366f1 !important; }
+
+/* ── Placeholders ────────────────────────────────────────────────── */
+[data-theme="light"] .placeholder-slate-500::placeholder { color: #94a3b8 !important; }
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+[data-theme="light"] .bg-indigo-600           { background: #4f46e5 !important; }
 [data-theme="light"] .hover\:bg-indigo-500:hover { background: #4338ca !important; }
