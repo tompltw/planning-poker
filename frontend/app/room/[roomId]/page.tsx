@@ -346,10 +346,13 @@ export default function RoomPage() {
             )}
             {room.host_id === userId && room.tickets.length > 0 && (
               <button
-                onClick={() => { setShowTicketInput(true); }}
+                onClick={() => {
+                  setTicketInput(room.tickets.map(t => t.title).join("\n"));
+                  setShowTicketInput(true);
+                }}
                 className="text-xs text-slate-400 hover:text-slate-300 border border-slate-600 px-2 py-1 rounded-lg"
               >
-                ✏️ Replace Backlog
+                ✏️ Edit Backlog
               </button>
             )}
           </div>
