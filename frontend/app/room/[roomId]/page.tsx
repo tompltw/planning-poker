@@ -489,7 +489,7 @@ export default function RoomPage() {
           )}
         </div>
 
-        {/* Participants Table */}
+        {/* Participants — Poker Table Layout */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">
@@ -499,31 +499,60 @@ export default function RoomPage() {
               <span className="text-green-400 text-xs animate-pulse">All votes in!</span>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {room.participants.map((p) => (
-              <div
-                key={p.id}
-                className={`relative bg-slate-800/60 border rounded-xl p-4 text-center transition ${
-                  p.id === userId ? "border-indigo-500/60" : "border-slate-700/50"
-                }`}
-              >
-                {p.is_observer && (
-                  <span className="absolute top-1.5 right-1.5 text-xs bg-slate-700 text-slate-400 px-1.5 py-0.5 rounded">👁 observer</span>
-                )}
-                <div className="text-2xl mb-2">
-                  {p.vote === null ? "⬜" : p.vote === "voted" ? "✅" : null}
+
+          {/* Poker table */}
+          {(() => {
+            const all = room.participants;
+            const half = Math.ceil(all.length / 2);
+            const topRow = all.slice(0, half);
+            const bottomRow = [...all.slice(half)].reverse();
+
+            const renderSeat = (p: Participant) => (
+              <div key={p.id} className="flex flex-col items-center gap-1">
+                {/* Playing card */}
+                <div className={`w-12 h-16 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all
+                  ${p.id === userId ? "border-indigo-400 shadow-lg shadow-indigo-500/20" : "border-slate-600"}
+                  ${p.vote === null
+                    ? "bg-slate-700/60"
+                    : p.vote === "voted"
+                    ? "bg-indigo-950 border-indigo-500/60 shadow shadow-indigo-500/30"
+                    : "bg-slate-800 border-slate-400/60"}`}>
+                  {p.vote === null && <span className="text-slate-500 text-xl">?</span>}
+                  {p.vote === "voted" && <span className="text-lg">🂠</span>}
                   {p.vote !== null && p.vote !== "voted" && (
-                    <span className={`text-2xl font-bold ${getVoteColor(p.vote, room.revealed)}`}>{p.vote}</span>
+                    <span className={getVoteColor(p.vote, room.revealed)}>{p.vote}</span>
                   )}
                 </div>
-                <p className="text-sm text-slate-200 font-medium truncate">
-                  {room.host_id === p.id && <span className="text-yellow-400 mr-1">👑</span>}
-                  {p.name}
-                </p>
-                {p.id === userId && <p className="text-xs text-indigo-400">(you)</p>}
+                {/* Name */}
+                <div className="text-center">
+                  <p className="text-xs text-slate-300 font-medium truncate max-w-[56px]">
+                    {room.host_id === p.id && <span className="text-yellow-400">👑</span>}{p.name}
+                  </p>
+                  {p.id === userId && <p className="text-xs text-indigo-400">you</p>}
+                  {p.is_observer && <p className="text-xs text-slate-500">👁</p>}
+                </div>
               </div>
-            ))}
-          </div>
+            );
+
+            return (
+              <div className="flex flex-col items-center gap-0">
+                {/* Top row */}
+                <div className="flex gap-4 justify-center px-4 pb-2 z-10">
+                  {topRow.map(renderSeat)}
+                </div>
+                {/* Oval table */}
+                <div className="w-full max-w-lg bg-gradient-to-b from-green-900/60 to-green-950/80 border-4 border-green-700/50 rounded-[50%] h-24 flex items-center justify-center shadow-inner shadow-green-900/50 px-8">
+                  <p className="text-slate-300/80 text-xs text-center truncate max-w-[280px]">
+                    {room.story || (room.tickets.length > 0 && room.ticket_index >= 0 ? room.tickets[room.ticket_index]?.title : "") || "🃏 Waiting for story…"}
+                  </p>
+                </div>
+                {/* Bottom row */}
+                <div className="flex gap-4 justify-center px-4 pt-2 z-10">
+                  {bottomRow.map(renderSeat)}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Stats (revealed) */}
