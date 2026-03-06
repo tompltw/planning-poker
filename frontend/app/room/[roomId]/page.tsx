@@ -261,6 +261,22 @@ export default function RoomPage() {
   const votedCount = voters.filter(p => p.vote !== null).length;
   const allVoted = voters.length > 0 && voters.every(p => p.vote !== null);
 
+  // ── Light-mode inline style helpers ────────────────────────────────
+  const isLight = theme === "light";
+  const LT = {
+    panel:       isLight ? { background: "rgba(255,255,255,0.85)", border: "1px solid rgba(0,0,0,0.09)", backdropFilter: "blur(12px)" } as React.CSSProperties : {} as React.CSSProperties,
+    panelGreen:  isLight ? { background: "rgba(22,163,74,0.06)", border: "1px solid rgba(22,163,74,0.25)" } as React.CSSProperties : {} as React.CSSProperties,
+    input:       isLight ? { background: "#ffffff", borderColor: "#d1d5db", color: "#0f172a" } as React.CSSProperties : {} as React.CSSProperties,
+    headerBtn:   isLight ? { background: "rgba(0,0,0,0.05)", borderColor: "#d1d5db", color: "#334155" } as React.CSSProperties : {} as React.CSSProperties,
+    voteCardDef: isLight ? { background: "#ffffff", borderColor: "#e2e8f0", color: "#1e293b", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } as React.CSSProperties : {} as React.CSSProperties,
+    voteCardSel: isLight ? { background: "#1a6b3a", borderColor: "#15803d", color: "#ffffff", boxShadow: "0 4px 16px rgba(26,107,58,0.35)" } as React.CSSProperties : {} as React.CSSProperties,
+    seatCard:    isLight ? { background: "#ffffff", borderColor: "#e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" } as React.CSSProperties : {} as React.CSSProperties,
+    seatVoted:   isLight ? { background: "#ede9fe", borderColor: "#a78bfa" } as React.CSSProperties : {} as React.CSSProperties,
+    seatReveal:  isLight ? { background: "#f0fdf4", borderColor: "#86efac" } as React.CSSProperties : {} as React.CSSProperties,
+    breakdown:   isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0" } as React.CSSProperties : {} as React.CSSProperties,
+    accentBtn:   isLight ? { background: "#1a6b3a", color: "#ffffff" } as React.CSSProperties : {} as React.CSSProperties,
+  };
+
   // Before mount: always render spinner (server and client match)
   if (!mounted) {
     return (
@@ -368,12 +384,13 @@ export default function RoomPage() {
             <div className={`w-2 h-2 rounded-full ${connected ? "bg-green-400" : "bg-red-400"}`} />
             <button
               onClick={copyCode}
+              style={LT.headerBtn}
               className="flex items-center gap-2 bg-slate-700/80 hover:bg-slate-600/80 border border-slate-600 text-slate-200 text-sm px-3 py-1.5 rounded-lg transition"
             >
               <span className="font-mono font-bold tracking-wider text-indigo-300">{roomId}</span>
               <span className="text-slate-400">{copied ? "✓" : "📋"}</span>
             </button>
-            <button onClick={copyLink} className="text-slate-400 hover:text-white text-xs px-2 py-1 bg-slate-800 rounded-lg border border-slate-700">
+            <button onClick={copyLink} style={LT.headerBtn} className="text-slate-400 hover:text-white text-xs px-2 py-1 bg-slate-800 rounded-lg border border-slate-700">
               Share Link
             </button>
             {/* Theme toggle */}
@@ -390,9 +407,9 @@ export default function RoomPage() {
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
         {/* Story / Ticket Panel */}
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5">
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5" style={LT.panel}>
           <div className="flex items-center justify-between mb-3">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-slate-400 tracking-wide">
               {room.tickets.length > 0 ? `Ticket ${room.ticket_index + 1} of ${room.tickets.length}` : "Current Story / Ticket"}
             </label>
             {room.host_id === userId && room.tickets.length === 0 && (
@@ -421,6 +438,7 @@ export default function RoomPage() {
             <div className="mb-4">
               <textarea
                 autoFocus
+                style={LT.input}
                 className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm font-mono"
                 rows={5}
                 placeholder={"One ticket per line:\nUSER-101 Add login page\nUSER-102 Fix checkout bug\nUSER-103 Dark mode"}
@@ -443,6 +461,7 @@ export default function RoomPage() {
             room.host_id === userId ? (
               <div className="flex gap-3">
                 <input
+                  style={LT.input}
                   className="flex-1 bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
                   placeholder="Describe the story or paste a ticket ID..."
                   value={storyInput}
@@ -464,7 +483,7 @@ export default function RoomPage() {
           {/* Ticket backlog list */}
           {room.tickets.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Backlog</p>
+              <p className="text-xs font-semibold text-slate-400 tracking-wide mb-2">Backlog</p>
               <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
                 {room.tickets.map((t, i) => (
                   <div
@@ -524,7 +543,7 @@ export default function RoomPage() {
         {/* Participants — Poker Table Layout */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">
+            <h2 className="text-sm font-semibold text-slate-400 tracking-wide">
               Participants — {votedCount}/{voters.length} voted
             </h2>
             {allVoted && !room.revealed && (
@@ -542,7 +561,11 @@ export default function RoomPage() {
             const renderSeat = (p: Participant) => (
               <div key={p.id} className="flex flex-col items-center gap-1">
                 {/* Playing card */}
-                <div className={`w-12 h-16 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all backdrop-blur-sm
+                <div
+                  style={isLight
+                    ? (p.vote === "voted" ? LT.seatVoted : p.vote !== null ? LT.seatReveal : LT.seatCard)
+                    : {}}
+                  className={`w-12 h-16 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all backdrop-blur-sm
                   ${p.id === userId ? "border-indigo-400 shadow-lg shadow-indigo-500/30" : "border-white/20"}
                   ${p.vote === null
                     ? "bg-white/8"
@@ -589,9 +612,9 @@ export default function RoomPage() {
 
         {/* Stats (revealed) */}
         {room.revealed && (
-          <div className={`rounded-2xl p-6 border backdrop-blur-sm ${room.stats?.consensus ? "bg-green-500/10 border-green-500/30" : "bg-white/5 border-white/10"}`}>
+          <div style={room.stats?.consensus ? LT.panelGreen : LT.panel} className={`rounded-2xl p-6 border backdrop-blur-sm ${room.stats?.consensus ? "bg-green-500/10 border-green-500/30" : "bg-white/5 border-white/10"}`}>
             <div className="flex items-center gap-2 mb-5">
-              <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Results</h2>
+              <h2 className="text-sm font-semibold text-slate-300 tracking-wide">Results</h2>
               {room.stats?.consensus && <span className="text-green-400 text-sm font-bold">🎉 Consensus!</span>}
             </div>
             {room.stats && (
@@ -612,7 +635,7 @@ export default function RoomPage() {
             )}
             {/* Vote Breakdown */}
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wider mb-3">Vote Breakdown</p>
+              <p className="text-xs font-semibold text-slate-400 tracking-wide mb-3">Vote Breakdown</p>
               <div className="flex flex-wrap gap-2">
                 {(() => {
                   const tally: Record<string, string[]> = {};
@@ -629,7 +652,7 @@ export default function RoomPage() {
                       return 0;
                     })
                     .map(([val, names]) => (
-                      <div key={val} className="bg-slate-700/60 border border-slate-600 rounded-xl px-4 py-2 flex items-center gap-3">
+                      <div key={val} style={LT.breakdown} className="bg-slate-700/60 border border-slate-600 rounded-xl px-4 py-2 flex items-center gap-3">
                         <span className="text-lg font-bold text-white">{val}</span>
                         <div className="flex flex-col">
                           <span className="text-xs text-slate-400">{names.length} vote{names.length > 1 ? "s" : ""}</span>
@@ -646,7 +669,7 @@ export default function RoomPage() {
         {/* Voting Cards */}
         {!isObserver && (
           <div>
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-slate-400 tracking-wide mb-4">
               {room.revealed ? "Round Complete" : "Cast Your Vote"}
             </h2>
             <div className="flex flex-wrap gap-3 justify-center">
@@ -655,6 +678,7 @@ export default function RoomPage() {
                   key={card}
                   onClick={() => vote(card)}
                   disabled={room.revealed}
+                  style={myVote === card && !room.revealed ? LT.voteCardSel : LT.voteCardDef}
                   className={`
                     w-16 h-24 rounded-xl text-xl font-bold border-2 transition-all transform
                     ${room.revealed ? "opacity-50 cursor-not-allowed" : "hover:scale-110 hover:-translate-y-1 cursor-pointer"}
@@ -678,6 +702,7 @@ export default function RoomPage() {
               <button
                 onClick={reveal}
                 disabled={votedCount === 0}
+                style={isLight ? {background: votedCount === 0 ? '#94a3b8' : '#1a6b3a', color: '#fff'} : {}}
                 className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold px-8 py-3 rounded-xl transition text-lg"
               >
                 Reveal Cards 👁
@@ -688,6 +713,7 @@ export default function RoomPage() {
                   room.ticket_index < room.tickets.length - 1 ? (
                     <button
                       onClick={nextTicket}
+                      style={isLight ? {background:'#1a6b3a', color:'#fff'} : {}}
                       className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition text-lg"
                     >
                       Next Ticket →
