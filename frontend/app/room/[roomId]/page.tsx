@@ -541,7 +541,7 @@ export default function RoomPage() {
                   {topRow.map(renderSeat)}
                 </div>
                 {/* Oval table */}
-                <div className="w-full max-w-lg bg-gradient-to-b from-green-900/60 to-green-950/80 border-4 border-green-700/50 rounded-[50%] h-24 flex items-center justify-center shadow-inner shadow-green-900/50 px-8">
+                <div className="w-full max-w-lg bg-gradient-to-b from-green-900/60 to-green-950/80 border-4 border-green-700/50 rounded-3xl h-24 flex items-center justify-center shadow-inner shadow-green-900/50 px-8">
                   <p className="text-slate-300/80 text-xs text-center truncate max-w-[280px]">
                     {room.story || (room.tickets.length > 0 && room.ticket_index >= 0 ? room.tickets[room.ticket_index]?.title : "") || "🃏 Waiting for story…"}
                   </p>
