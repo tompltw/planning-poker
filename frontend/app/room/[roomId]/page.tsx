@@ -420,7 +420,7 @@ export default function RoomPage() {
                     <span className="flex items-center gap-2 truncate">
                       <span className="text-slate-500 text-xs w-5 shrink-0">{i + 1}.</span>
                       {i === room.ticket_index && <span className="text-indigo-400">▶</span>}
-                      {i < room.ticket_index && <span className="text-green-500">✓</span>}
+                      {i !== room.ticket_index && t.estimate && <span className="text-green-500">✓</span>}
                       <span className="truncate">{t.title}</span>
                     </span>
                     <span className="shrink-0">
