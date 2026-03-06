@@ -13,35 +13,15 @@ function getWsBase(): string {
 const FIBONACCI_CARDS = ["0", "1", "2", "3", "5", "8", "13", "21", "?", "☕"];
 
 const THEMES = {
-  obsidian: {
-    name: "Obsidian", swatch: "#18181b",
-    pageStyle: { background: "linear-gradient(135deg,#18181b 0%,#09090b 55%,#0a0a1c 100%)" },
-    headerStyle: { background: "rgba(9,9,11,0.85)", borderColor: "rgba(39,39,42,0.5)", backdropFilter: "blur(12px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#052e16 0%,#022c22 100%)", borderColor: "rgba(20,83,45,0.55)" },
+  dark: {
+    pageStyle:   { background: "linear-gradient(160deg,#0f0f10 0%,#111318 60%,#0d1020 100%)" },
+    headerStyle: { background: "rgba(10,10,12,0.80)", borderColor: "rgba(255,255,255,0.07)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#0d2d1a 0%,#061a0e 100%)", borderColor: "rgba(20,83,45,0.65)", boxShadow: "inset 0 2px 20px rgba(0,0,0,0.6)" },
   },
-  midnight: {
-    name: "Midnight", swatch: "#0f172a",
-    pageStyle: { background: "linear-gradient(135deg,#0f172a 0%,#020617 55%,#08091c 100%)" },
-    headerStyle: { background: "rgba(2,6,23,0.85)", borderColor: "rgba(30,41,59,0.5)", backdropFilter: "blur(12px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#0c1a35 0%,#060e1f 100%)", borderColor: "rgba(30,58,138,0.45)" },
-  },
-  arctic: {
-    name: "Arctic", swatch: "#0c1222",
-    pageStyle: { background: "linear-gradient(135deg,#0c1222 0%,#05080f 55%,#070c1a 100%)" },
-    headerStyle: { background: "rgba(5,8,15,0.85)", borderColor: "rgba(8,145,178,0.15)", backdropFilter: "blur(12px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#042330 0%,#020d18 100%)", borderColor: "rgba(8,145,178,0.35)" },
-  },
-  ember: {
-    name: "Ember", swatch: "#1c0800",
-    pageStyle: { background: "linear-gradient(135deg,#1c0800 0%,#0d0500 55%,#150301 100%)" },
-    headerStyle: { background: "rgba(13,5,0,0.85)", borderColor: "rgba(124,45,18,0.3)", backdropFilter: "blur(12px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#1a0800 0%,#0a0300 100%)", borderColor: "rgba(194,65,12,0.35)" },
-  },
-  iris: {
-    name: "Iris", swatch: "#1e1030",
-    pageStyle: { background: "linear-gradient(135deg,#1e1030 0%,#0a0614 55%,#12082a 100%)" },
-    headerStyle: { background: "rgba(10,6,20,0.85)", borderColor: "rgba(88,28,135,0.3)", backdropFilter: "blur(12px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#1a083a 0%,#0a0420 100%)", borderColor: "rgba(109,40,217,0.4)" },
+  light: {
+    pageStyle:   { background: "linear-gradient(160deg,#f8f9fa 0%,#f1f5f9 60%,#e8ecf0 100%)" },
+    headerStyle: { background: "rgba(255,255,255,0.85)", borderColor: "rgba(0,0,0,0.08)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#1a5c2e 0%,#0d3a1c 100%)", borderColor: "rgba(26,92,46,0.9)", boxShadow: "inset 0 2px 20px rgba(0,0,0,0.3),0 4px 32px rgba(13,58,28,0.25)" },
   },
 } as const;
 type ThemeKey = keyof typeof THEMES;
@@ -139,7 +119,7 @@ export default function RoomPage() {
   const [editingEstimate, setEditingEstimate] = useState<string | null>(null); // ticket id
   const [estimateEdit, setEstimateEdit] = useState("");
   const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<ThemeKey>("obsidian");
+  const [theme, setTheme] = useState<ThemeKey>("dark");
 
   // Mark mounted — guarantees server and client initial render are identical (both show spinner)
   useEffect(() => { setMounted(true); }, []);
@@ -373,7 +353,7 @@ export default function RoomPage() {
   const T = THEMES[theme];
 
   return (
-    <div className="min-h-screen flex flex-col" style={T.pageStyle}>
+    <div className="min-h-screen flex flex-col" data-theme={theme} style={T.pageStyle}>
       {/* Header */}
       <header className="border-b px-6 py-4" style={T.headerStyle}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -396,18 +376,14 @@ export default function RoomPage() {
             <button onClick={copyLink} className="text-slate-400 hover:text-white text-xs px-2 py-1 bg-slate-800 rounded-lg border border-slate-700">
               Share Link
             </button>
-            {/* Theme picker */}
-            <div className="flex items-center gap-1 ml-1">
-              {(Object.entries(THEMES) as [ThemeKey, typeof THEMES[ThemeKey]][]).map(([key, t]) => (
-                <button
-                  key={key}
-                  title={t.name}
-                  onClick={() => applyTheme(key)}
-                  className={`w-5 h-5 rounded-full border-2 transition ${theme === key ? "border-white scale-110" : "border-transparent hover:border-white/50"}`}
-                  style={{ backgroundColor: t.swatch }}
-                />
-              ))}
-            </div>
+            {/* Theme toggle */}
+            <button
+              onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}
+              title={theme === "dark" ? "Switch to Light" : "Switch to Dark"}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-base transition hover:bg-white/10"
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
           </div>
         </div>
       </header>
