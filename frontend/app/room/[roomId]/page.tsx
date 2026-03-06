@@ -184,6 +184,8 @@ export default function RoomPage() {
 
   const nextTicket = () => send({ type: "next_ticket" });
 
+  const gotoTicket = (index: number) => send({ type: "goto_ticket", index });
+
   const saveEstimate = (ticketId: string) => {
     send({ type: "set_estimate", ticket_id: ticketId, estimate: estimateEdit });
     setEditingEstimate(null);
@@ -405,13 +407,15 @@ export default function RoomPage() {
                 {room.tickets.map((t, i) => (
                   <div
                     key={t.id}
-                    className={`flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm ${
+                    onClick={() => { if (room.host_id === userId && i !== room.ticket_index) gotoTicket(i); }}
+                    className={`flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm transition ${
                       i === room.ticket_index
                         ? "bg-indigo-600/20 border border-indigo-500/40 text-white"
                         : i < room.ticket_index
-                        ? "text-slate-500 bg-slate-800/30"
-                        : "text-slate-300 bg-slate-800/20"
+                        ? `text-slate-500 bg-slate-800/30 ${room.host_id === userId ? "cursor-pointer hover:bg-slate-700/50 hover:text-slate-300 hover:border hover:border-slate-600" : ""}`
+                        : `text-slate-300 bg-slate-800/20 ${room.host_id === userId ? "cursor-pointer hover:bg-indigo-900/20 hover:border hover:border-indigo-700/40" : ""}`
                     }`}
+                    title={room.host_id === userId && i !== room.ticket_index ? "Click to jump to this ticket" : undefined}
                   >
                     <span className="flex items-center gap-2 truncate">
                       <span className="text-slate-500 text-xs w-5 shrink-0">{i + 1}.</span>

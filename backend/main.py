@@ -217,6 +217,18 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: str):
                             p["vote"] = None
                         await broadcast(room, {"type": "state", "room": room.to_dict()})
 
+            elif event_type == "goto_ticket":
+                # Host jumps directly to any ticket by index
+                if user_id == room.host_id and room.ticket_index >= 0:
+                    idx = msg.get("index", -1)
+                    if 0 <= idx < len(room.tickets) and idx != room.ticket_index:
+                        room.ticket_index = idx
+                        room.story = room.tickets[idx]["title"]
+                        room.revealed = False
+                        for p in room.participants.values():
+                            p["vote"] = None
+                        await broadcast(room, {"type": "state", "room": room.to_dict()})
+
             elif event_type == "set_estimate":
                 # Host manually sets/overrides estimate for a ticket
                 if user_id == room.host_id:
