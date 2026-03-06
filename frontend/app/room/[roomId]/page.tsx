@@ -21,7 +21,7 @@ const THEMES = {
   light: {
     pageStyle:   { background: "#f0f4f8" },
     headerStyle: { background: "rgba(255,255,255,0.92)", borderColor: "rgba(0,0,0,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#166534 0%,#0f4a26 100%)", borderColor: "rgba(22,101,52,0.9)", boxShadow: "inset 0 2px 12px rgba(0,0,0,0.25),0 4px 20px rgba(22,101,52,0.3)" },
+    tableStyle:  { background: "#dcfce7", borderColor: "#86efac", boxShadow: "0 2px 12px rgba(22,163,74,0.12)" },
   },
 } as const;
 type ThemeKey = keyof typeof THEMES;
@@ -281,7 +281,7 @@ export default function RoomPage() {
     seatVoted:      isLight ? { background: "#dcfce7", borderColor: "#4ade80" } as React.CSSProperties : {} as React.CSSProperties,
     seatReveal:     isLight ? { background: "#f0fdf4", borderColor: "#22c55e" } as React.CSSProperties : {} as React.CSSProperties,
     breakdown:      isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0" } as React.CSSProperties : {} as React.CSSProperties,
-    accentBtn:      isLight ? { background: "#16a34a", color: "#ffffff", borderRadius: "10px", border: "none" } as React.CSSProperties : {} as React.CSSProperties,
+    accentBtn:      isLight ? { background: "#166534", color: "#ffffff", borderRadius: "10px", border: "none" } as React.CSSProperties : {} as React.CSSProperties,
     accentBtnDis:   isLight ? { background: "#cbd5e1", color: "#94a3b8", borderRadius: "10px", border: "none", cursor: "not-allowed", opacity: 1 } as React.CSSProperties : {} as React.CSSProperties,
     setBtn:         isLight ? { background: "#f1f5f9", border: "1px solid #e2e8f0", color: "#334155", borderRadius: "10px" } as React.CSSProperties : {} as React.CSSProperties,
     ticketActive:   isLight ? { background: "rgba(22,163,74,0.08)", border: "1px solid rgba(22,163,74,0.3)", color: "#0f172a" } as React.CSSProperties : {} as React.CSSProperties,
@@ -616,7 +616,7 @@ export default function RoomPage() {
                 </div>
                 {/* Oval table */}
                 <div className="w-full max-w-lg border-4 rounded-3xl h-24 flex items-center justify-center px-8 shadow-inner" style={T.tableStyle}>
-                  <p className="text-slate-300/80 text-xs text-center truncate max-w-[280px]">
+                  <p className="text-xs text-center truncate max-w-[280px] font-medium" style={isLight ? {color:"#166534"} : {color:"rgba(203,213,225,0.8)"}}>
                     {room.story || (room.tickets.length > 0 && room.ticket_index >= 0 ? room.tickets[room.ticket_index]?.title : "") || "🃏 Waiting for story…"}
                   </p>
                 </div>
