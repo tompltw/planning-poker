@@ -104,6 +104,10 @@ export default function RoomPage() {
   const [showTicketInput, setShowTicketInput] = useState(false);
   const [editingEstimate, setEditingEstimate] = useState<string | null>(null); // ticket id
   const [estimateEdit, setEstimateEdit] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  // Mark mounted — guarantees server and client initial render are identical (both show spinner)
+  useEffect(() => { setMounted(true); }, []);
 
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -234,6 +238,18 @@ export default function RoomPage() {
   const voters = room?.participants.filter(p => !p.is_observer) ?? [];
   const votedCount = voters.filter(p => p.vote !== null).length;
   const allVoted = voters.length > 0 && voters.every(p => p.vote !== null);
+
+  // Before mount: always render spinner (server and client match)
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="text-center">
+          <div className="animate-spin text-4xl mb-4">⚙️</div>
+          <p className="text-slate-400">Connecting to room {roomId}...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Name prompt — shown when no name available from URL or sessionStorage
   if (!nameReady) {
