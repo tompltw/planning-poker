@@ -88,7 +88,7 @@ class Room:
                 ticket["estimate"] = stats["consensus_value"]
             else:
                 avg = stats["average"]
-                ticket["estimate"] = str(int(avg + 0.5))  # standard rounding: >=0.5 up, <0.5 down
+                ticket["estimate"] = str(int(avg)) if avg == int(avg) else str(avg)
 
 
 # In-memory store
