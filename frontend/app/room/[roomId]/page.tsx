@@ -277,12 +277,13 @@ export default function RoomPage() {
     mutedText:      isLight ? { color: "#475569" } as React.CSSProperties : {} as React.CSSProperties,
     voteCardDef:    isLight ? { background: "#ffffff", borderColor: "#e2e8f0", color: "#1e293b", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" } as React.CSSProperties : {} as React.CSSProperties,
     voteCardSel:    isLight ? { background: "#16a34a", borderColor: "#15803d", color: "#ffffff", boxShadow: "0 4px 16px rgba(22,163,74,0.35)", transform: "scale(1.1) translateY(-4px)" } as React.CSSProperties : {} as React.CSSProperties,
-    seatCard:       isLight ? { background: "#ffffff", borderColor: "#e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" } as React.CSSProperties : {} as React.CSSProperties,
-    seatVoted:      isLight ? { background: "#dcfce7", borderColor: "#86efac" } as React.CSSProperties : {} as React.CSSProperties,
+    seatCard:       isLight ? { background: "#ffffff", borderColor: "#cbd5e1", boxShadow: "0 2px 6px rgba(0,0,0,0.10)" } as React.CSSProperties : {} as React.CSSProperties,
+    seatVoted:      isLight ? { background: "#dcfce7", borderColor: "#4ade80" } as React.CSSProperties : {} as React.CSSProperties,
     seatReveal:     isLight ? { background: "#f0fdf4", borderColor: "#22c55e" } as React.CSSProperties : {} as React.CSSProperties,
     breakdown:      isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0" } as React.CSSProperties : {} as React.CSSProperties,
-    accentBtn:      isLight ? { background: "#16a34a", color: "#ffffff", borderRadius: "10px" } as React.CSSProperties : {} as React.CSSProperties,
-    accentBtnDis:   isLight ? { background: "#94a3b8", color: "#ffffff", borderRadius: "10px" } as React.CSSProperties : {} as React.CSSProperties,
+    accentBtn:      isLight ? { background: "#16a34a", color: "#ffffff", borderRadius: "10px", border: "none" } as React.CSSProperties : {} as React.CSSProperties,
+    accentBtnDis:   isLight ? { background: "#cbd5e1", color: "#94a3b8", borderRadius: "10px", border: "none", cursor: "not-allowed", opacity: 1 } as React.CSSProperties : {} as React.CSSProperties,
+    setBtn:         isLight ? { background: "#f1f5f9", border: "1px solid #e2e8f0", color: "#334155", borderRadius: "10px" } as React.CSSProperties : {} as React.CSSProperties,
     ticketActive:   isLight ? { background: "rgba(22,163,74,0.08)", border: "1px solid rgba(22,163,74,0.3)", color: "#0f172a" } as React.CSSProperties : {} as React.CSSProperties,
     ticketDone:     isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0", color: "#94a3b8" } as React.CSSProperties : {} as React.CSSProperties,
     ticketPending:  isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0", color: "#334155" } as React.CSSProperties : {} as React.CSSProperties,
@@ -484,16 +485,16 @@ export default function RoomPage() {
                   onChange={(e) => setStoryInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && setStory()}
                 />
-                <button onClick={setStory} className="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2.5 rounded-xl border border-slate-600 transition">Set</button>
+                <button onClick={setStory} style={LT.setBtn} className="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2.5 rounded-xl border border-slate-600 transition">Set</button>
               </div>
             ) : (
-              <p className="text-slate-500 text-sm italic">Only the host can set the story.</p>
+              <p className="text-slate-500 text-sm italic" style={LT.mutedText}>Only the host can set the story.</p>
             )
           )}
 
           {/* Current ticket display */}
           {room.story && (
-            <p className="text-indigo-300 text-sm mt-2 font-medium">📌 {room.story}</p>
+            <p className="text-indigo-300 text-sm mt-2 font-medium" style={LT.headerAccent}>📌 {room.story}</p>
           )}
 
           {/* Ticket backlog list */}
@@ -582,24 +583,26 @@ export default function RoomPage() {
                     ? (p.vote === "voted" ? LT.seatVoted : p.vote !== null ? LT.seatReveal : LT.seatCard)
                     : {}}
                   className={`w-12 h-16 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all backdrop-blur-sm
-                  ${p.id === userId ? "border-indigo-400 shadow-lg shadow-indigo-500/30" : "border-white/20"}
+                  ${isLight
+                    ? (p.id === userId ? "border-green-500 shadow-md" : "border-slate-300")
+                    : (p.id === userId ? "border-indigo-400 shadow-lg shadow-indigo-500/30" : "border-white/20")}
                   ${p.vote === null
-                    ? "bg-white/8"
+                    ? (isLight ? "" : "bg-white/8")
                     : p.vote === "voted"
-                    ? "bg-indigo-500/20 border-indigo-400/50 shadow shadow-indigo-500/25"
+                    ? (isLight ? "" : "bg-indigo-500/20 border-indigo-400/50 shadow shadow-indigo-500/25")
                     : "bg-white/12 border-white/30"}`}>
-                  {p.vote === null && <span className="text-slate-500 text-xl">?</span>}
+                  {p.vote === null && <span className={isLight ? "text-slate-400 text-xl font-bold" : "text-slate-500 text-xl"}>?</span>}
                   {p.vote === "voted" && <span className="text-lg">🂠</span>}
                   {p.vote !== null && p.vote !== "voted" && (
-                    <span className={getVoteColor(p.vote, room.revealed)}>{p.vote}</span>
+                    <span className={isLight ? "text-slate-700 font-bold" : getVoteColor(p.vote, room.revealed)}>{p.vote}</span>
                   )}
                 </div>
                 {/* Name */}
                 <div className="text-center">
-                  <p className="text-xs text-slate-300 font-medium truncate max-w-[56px]">
-                    {room.host_id === p.id && <span className="text-yellow-400">👑</span>}{p.name}
+                  <p className="text-xs font-medium truncate max-w-[56px]" style={isLight ? {color:"#334155"} : {color:"#cbd5e1"}}>
+                    {room.host_id === p.id && <span className="text-yellow-500">👑</span>}{p.name}
                   </p>
-                  {p.id === userId && <p className="text-xs text-indigo-400">you</p>}
+                  {p.id === userId && <p className="text-xs font-semibold" style={LT.headerAccent || {color:"#818cf8"}}>you</p>}
                   {p.is_observer && <p className="text-xs text-slate-500">👁</p>}
                 </div>
               </div>
@@ -723,7 +726,7 @@ export default function RoomPage() {
                 onClick={reveal}
                 disabled={votedCount === 0}
                 style={isLight ? (votedCount === 0 ? LT.accentBtnDis : LT.accentBtn) : {}}
-                className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold px-8 py-3 rounded-xl transition text-lg"
+                className={`font-bold px-8 py-3 rounded-xl transition text-lg ${isLight ? "" : "bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40"} disabled:cursor-not-allowed text-white`}
               >
                 Reveal Cards 👁
               </button>
