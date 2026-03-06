@@ -13,11 +13,36 @@ function getWsBase(): string {
 const FIBONACCI_CARDS = ["0", "1", "2", "3", "5", "8", "13", "21", "?", "☕"];
 
 const THEMES = {
-  dark:   { name: "Dark",   swatch: "#1e293b", page: "bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950",  header: "bg-slate-900/60 border-slate-700/50",  table: "from-green-900/60 to-green-950/80 border-green-700/50" },
-  ocean:  { name: "Ocean",  swatch: "#0c4a6e", page: "bg-gradient-to-br from-blue-950 via-blue-900 to-teal-950",      header: "bg-blue-950/60 border-blue-700/50",    table: "from-teal-800/60 to-teal-950/80 border-teal-600/50" },
-  forest: { name: "Forest", swatch: "#14532d", page: "bg-gradient-to-br from-emerald-950 via-emerald-900 to-green-950", header: "bg-emerald-950/60 border-emerald-700/50", table: "from-emerald-700/60 to-emerald-950/80 border-emerald-500/50" },
-  sunset: { name: "Sunset", swatch: "#7c2d12", page: "bg-gradient-to-br from-orange-950 via-rose-900 to-orange-950",  header: "bg-orange-950/60 border-orange-800/50", table: "from-amber-800/60 to-orange-950/80 border-amber-600/50" },
-  nebula: { name: "Nebula", swatch: "#4c1d95", page: "bg-gradient-to-br from-purple-950 via-violet-900 to-purple-950", header: "bg-purple-950/60 border-purple-700/50",  table: "from-violet-900/60 to-purple-950/80 border-violet-600/50" },
+  obsidian: {
+    name: "Obsidian", swatch: "#18181b",
+    pageStyle: { background: "linear-gradient(135deg,#18181b 0%,#09090b 55%,#0a0a1c 100%)" },
+    headerStyle: { background: "rgba(9,9,11,0.85)", borderColor: "rgba(39,39,42,0.5)", backdropFilter: "blur(12px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#052e16 0%,#022c22 100%)", borderColor: "rgba(20,83,45,0.55)" },
+  },
+  midnight: {
+    name: "Midnight", swatch: "#0f172a",
+    pageStyle: { background: "linear-gradient(135deg,#0f172a 0%,#020617 55%,#08091c 100%)" },
+    headerStyle: { background: "rgba(2,6,23,0.85)", borderColor: "rgba(30,41,59,0.5)", backdropFilter: "blur(12px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#0c1a35 0%,#060e1f 100%)", borderColor: "rgba(30,58,138,0.45)" },
+  },
+  arctic: {
+    name: "Arctic", swatch: "#0c1222",
+    pageStyle: { background: "linear-gradient(135deg,#0c1222 0%,#05080f 55%,#070c1a 100%)" },
+    headerStyle: { background: "rgba(5,8,15,0.85)", borderColor: "rgba(8,145,178,0.15)", backdropFilter: "blur(12px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#042330 0%,#020d18 100%)", borderColor: "rgba(8,145,178,0.35)" },
+  },
+  ember: {
+    name: "Ember", swatch: "#1c0800",
+    pageStyle: { background: "linear-gradient(135deg,#1c0800 0%,#0d0500 55%,#150301 100%)" },
+    headerStyle: { background: "rgba(13,5,0,0.85)", borderColor: "rgba(124,45,18,0.3)", backdropFilter: "blur(12px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#1a0800 0%,#0a0300 100%)", borderColor: "rgba(194,65,12,0.35)" },
+  },
+  iris: {
+    name: "Iris", swatch: "#1e1030",
+    pageStyle: { background: "linear-gradient(135deg,#1e1030 0%,#0a0614 55%,#12082a 100%)" },
+    headerStyle: { background: "rgba(10,6,20,0.85)", borderColor: "rgba(88,28,135,0.3)", backdropFilter: "blur(12px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#1a083a 0%,#0a0420 100%)", borderColor: "rgba(109,40,217,0.4)" },
+  },
 } as const;
 type ThemeKey = keyof typeof THEMES;
 
@@ -114,7 +139,7 @@ export default function RoomPage() {
   const [editingEstimate, setEditingEstimate] = useState<string | null>(null); // ticket id
   const [estimateEdit, setEstimateEdit] = useState("");
   const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<ThemeKey>("dark");
+  const [theme, setTheme] = useState<ThemeKey>("obsidian");
 
   // Mark mounted — guarantees server and client initial render are identical (both show spinner)
   useEffect(() => { setMounted(true); }, []);
@@ -348,9 +373,9 @@ export default function RoomPage() {
   const T = THEMES[theme];
 
   return (
-    <div className={`min-h-screen ${T.page} flex flex-col`}>
+    <div className="min-h-screen flex flex-col" style={T.pageStyle}>
       {/* Header */}
-      <header className={`border-b ${T.header} backdrop-blur px-6 py-4`}>
+      <header className="border-b px-6 py-4" style={T.headerStyle}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">🃏</span>
@@ -389,7 +414,7 @@ export default function RoomPage() {
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
         {/* Story / Ticket Panel */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-5">
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5">
           <div className="flex items-center justify-between mb-3">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
               {room.tickets.length > 0 ? `Ticket ${room.ticket_index + 1} of ${room.tickets.length}` : "Current Story / Ticket"}
@@ -541,13 +566,13 @@ export default function RoomPage() {
             const renderSeat = (p: Participant) => (
               <div key={p.id} className="flex flex-col items-center gap-1">
                 {/* Playing card */}
-                <div className={`w-12 h-16 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all
-                  ${p.id === userId ? "border-indigo-400 shadow-lg shadow-indigo-500/20" : "border-slate-600"}
+                <div className={`w-12 h-16 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all backdrop-blur-sm
+                  ${p.id === userId ? "border-indigo-400 shadow-lg shadow-indigo-500/30" : "border-white/20"}
                   ${p.vote === null
-                    ? "bg-slate-700/60"
+                    ? "bg-white/8"
                     : p.vote === "voted"
-                    ? "bg-indigo-950 border-indigo-500/60 shadow shadow-indigo-500/30"
-                    : "bg-slate-800 border-slate-400/60"}`}>
+                    ? "bg-indigo-500/20 border-indigo-400/50 shadow shadow-indigo-500/25"
+                    : "bg-white/12 border-white/30"}`}>
                   {p.vote === null && <span className="text-slate-500 text-xl">?</span>}
                   {p.vote === "voted" && <span className="text-lg">🂠</span>}
                   {p.vote !== null && p.vote !== "voted" && (
@@ -572,7 +597,7 @@ export default function RoomPage() {
                   {topRow.map(renderSeat)}
                 </div>
                 {/* Oval table */}
-                <div className={`w-full max-w-lg bg-gradient-to-b ${T.table} border-4 rounded-3xl h-24 flex items-center justify-center shadow-inner px-8`}>
+                <div className="w-full max-w-lg border-4 rounded-3xl h-24 flex items-center justify-center px-8 shadow-inner" style={T.tableStyle}>
                   <p className="text-slate-300/80 text-xs text-center truncate max-w-[280px]">
                     {room.story || (room.tickets.length > 0 && room.ticket_index >= 0 ? room.tickets[room.ticket_index]?.title : "") || "🃏 Waiting for story…"}
                   </p>
@@ -588,7 +613,7 @@ export default function RoomPage() {
 
         {/* Stats (revealed) */}
         {room.revealed && (
-          <div className={`rounded-2xl p-6 border ${room.stats?.consensus ? "bg-green-900/20 border-green-500/40" : "bg-slate-800/50 border-slate-700/50"}`}>
+          <div className={`rounded-2xl p-6 border backdrop-blur-sm ${room.stats?.consensus ? "bg-green-500/10 border-green-500/30" : "bg-white/5 border-white/10"}`}>
             <div className="flex items-center gap-2 mb-5">
               <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Results</h2>
               {room.stats?.consensus && <span className="text-green-400 text-sm font-bold">🎉 Consensus!</span>}
