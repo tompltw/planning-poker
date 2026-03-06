@@ -148,6 +148,10 @@ export default function RoomPage() {
     if (connected && !joined && nameReady) {
       send({ type: "join", name: userName, is_observer: isObserver });
       setJoined(true);
+      // Strip ?name= from address bar so copying the URL doesn't leak the name
+      if (typeof window !== "undefined" && window.location.search.includes("name=")) {
+        window.history.replaceState({}, "", `/room/${roomId}`);
+      }
     }
   }, [connected, joined, userName, isObserver, send, nameReady]);
 
