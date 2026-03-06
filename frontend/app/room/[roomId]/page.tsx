@@ -15,13 +15,13 @@ const FIBONACCI_CARDS = ["0", "1", "2", "3", "5", "8", "13", "21", "?", "☕"];
 const THEMES = {
   dark: {
     pageStyle:   { background: "linear-gradient(160deg,#0d1628 0%,#0a1220 60%,#070e1a 100%)" },
-    headerStyle: { background: "rgba(8,14,26,0.85)", borderColor: "rgba(255,255,255,0.08)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#0d2d1a 0%,#061a0e 100%)", borderColor: "rgba(20,83,45,0.65)", boxShadow: "inset 0 2px 20px rgba(0,0,0,0.5)" },
+    headerStyle: { background: "rgba(8,14,26,0.88)", borderColor: "rgba(255,255,255,0.08)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#0d2d1a 0%,#061a0e 100%)", borderColor: "rgba(34,197,94,0.25)", boxShadow: "inset 0 2px 16px rgba(0,0,0,0.5),0 0 40px rgba(34,197,94,0.06)" },
   },
   light: {
-    pageStyle:   { background: "linear-gradient(160deg,#f8f9fa 0%,#f1f5f9 60%,#e8ecf0 100%)" },
-    headerStyle: { background: "rgba(255,255,255,0.85)", borderColor: "rgba(0,0,0,0.08)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" },
-    tableStyle:  { background: "linear-gradient(180deg,#1a5c2e 0%,#0d3a1c 100%)", borderColor: "rgba(26,92,46,0.9)", boxShadow: "inset 0 2px 20px rgba(0,0,0,0.3),0 4px 32px rgba(13,58,28,0.25)" },
+    pageStyle:   { background: "#f0f4f8" },
+    headerStyle: { background: "rgba(255,255,255,0.92)", borderColor: "rgba(0,0,0,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" },
+    tableStyle:  { background: "linear-gradient(180deg,#166534 0%,#0f4a26 100%)", borderColor: "rgba(22,101,52,0.9)", boxShadow: "inset 0 2px 12px rgba(0,0,0,0.25),0 4px 20px rgba(22,101,52,0.3)" },
   },
 } as const;
 type ThemeKey = keyof typeof THEMES;
@@ -261,20 +261,36 @@ export default function RoomPage() {
   const votedCount = voters.filter(p => p.vote !== null).length;
   const allVoted = voters.length > 0 && voters.every(p => p.vote !== null);
 
-  // ── Light-mode inline style helpers ────────────────────────────────
+  // ── Theme inline style helpers ────────────────────────────────────
   const isLight = theme === "light";
+  // Light theme styles
   const LT = {
-    panel:       isLight ? { background: "rgba(255,255,255,0.85)", border: "1px solid rgba(0,0,0,0.09)", backdropFilter: "blur(12px)" } as React.CSSProperties : {} as React.CSSProperties,
-    panelGreen:  isLight ? { background: "rgba(22,163,74,0.06)", border: "1px solid rgba(22,163,74,0.25)" } as React.CSSProperties : {} as React.CSSProperties,
-    input:       isLight ? { background: "#ffffff", borderColor: "#d1d5db", color: "#0f172a" } as React.CSSProperties : {} as React.CSSProperties,
-    headerBtn:   isLight ? { background: "rgba(0,0,0,0.05)", borderColor: "#d1d5db", color: "#334155" } as React.CSSProperties : {} as React.CSSProperties,
-    voteCardDef: isLight ? { background: "#ffffff", borderColor: "#e2e8f0", color: "#1e293b", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" } as React.CSSProperties : {} as React.CSSProperties,
-    voteCardSel: isLight ? { background: "#1a6b3a", borderColor: "#15803d", color: "#ffffff", boxShadow: "0 4px 16px rgba(26,107,58,0.35)" } as React.CSSProperties : {} as React.CSSProperties,
-    seatCard:    isLight ? { background: "#ffffff", borderColor: "#e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" } as React.CSSProperties : {} as React.CSSProperties,
-    seatVoted:   isLight ? { background: "#ede9fe", borderColor: "#a78bfa" } as React.CSSProperties : {} as React.CSSProperties,
-    seatReveal:  isLight ? { background: "#f0fdf4", borderColor: "#86efac" } as React.CSSProperties : {} as React.CSSProperties,
-    breakdown:   isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0" } as React.CSSProperties : {} as React.CSSProperties,
-    accentBtn:   isLight ? { background: "#1a6b3a", color: "#ffffff" } as React.CSSProperties : {} as React.CSSProperties,
+    panel:          isLight ? { background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", borderRadius: "16px" } as React.CSSProperties : {} as React.CSSProperties,
+    panelGreen:     isLight ? { background: "rgba(22,163,74,0.05)", border: "1px solid rgba(22,163,74,0.2)", borderRadius: "16px" } as React.CSSProperties : {} as React.CSSProperties,
+    input:          isLight ? { background: "#ffffff", borderColor: "#d1d5db", color: "#0f172a" } as React.CSSProperties : {} as React.CSSProperties,
+    headerBtn:      isLight ? { background: "#f1f5f9", borderColor: "#e2e8f0", color: "#334155" } as React.CSSProperties : {} as React.CSSProperties,
+    headerTitle:    isLight ? { color: "#0f172a" } as React.CSSProperties : {} as React.CSSProperties,
+    headerSubtitle: isLight ? { color: "#64748b" } as React.CSSProperties : {} as React.CSSProperties,
+    headerAccent:   isLight ? { color: "#16a34a" } as React.CSSProperties : {} as React.CSSProperties,
+    sectionLabel:   isLight ? { color: "#64748b" } as React.CSSProperties : {} as React.CSSProperties,
+    bodyText:       isLight ? { color: "#0f172a" } as React.CSSProperties : {} as React.CSSProperties,
+    mutedText:      isLight ? { color: "#475569" } as React.CSSProperties : {} as React.CSSProperties,
+    voteCardDef:    isLight ? { background: "#ffffff", borderColor: "#e2e8f0", color: "#1e293b", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" } as React.CSSProperties : {} as React.CSSProperties,
+    voteCardSel:    isLight ? { background: "#16a34a", borderColor: "#15803d", color: "#ffffff", boxShadow: "0 4px 16px rgba(22,163,74,0.35)", transform: "scale(1.1) translateY(-4px)" } as React.CSSProperties : {} as React.CSSProperties,
+    seatCard:       isLight ? { background: "#ffffff", borderColor: "#e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" } as React.CSSProperties : {} as React.CSSProperties,
+    seatVoted:      isLight ? { background: "#dcfce7", borderColor: "#86efac" } as React.CSSProperties : {} as React.CSSProperties,
+    seatReveal:     isLight ? { background: "#f0fdf4", borderColor: "#22c55e" } as React.CSSProperties : {} as React.CSSProperties,
+    breakdown:      isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0" } as React.CSSProperties : {} as React.CSSProperties,
+    accentBtn:      isLight ? { background: "#16a34a", color: "#ffffff", borderRadius: "10px" } as React.CSSProperties : {} as React.CSSProperties,
+    accentBtnDis:   isLight ? { background: "#94a3b8", color: "#ffffff", borderRadius: "10px" } as React.CSSProperties : {} as React.CSSProperties,
+    ticketActive:   isLight ? { background: "rgba(22,163,74,0.08)", border: "1px solid rgba(22,163,74,0.3)", color: "#0f172a" } as React.CSSProperties : {} as React.CSSProperties,
+    ticketDone:     isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0", color: "#94a3b8" } as React.CSSProperties : {} as React.CSSProperties,
+    ticketPending:  isLight ? { background: "#f8fafc", border: "1px solid #e2e8f0", color: "#334155" } as React.CSSProperties : {} as React.CSSProperties,
+  };
+  // Dark theme inline styles (supplement Tailwind for premium glass look)
+  const DT = {
+    voteCardDef: !isLight ? { background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.14)", color: "#e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" } as React.CSSProperties : {} as React.CSSProperties,
+    voteCardSel: !isLight ? { background: "rgba(34,197,94,0.18)", borderColor: "#22c55e", color: "#ffffff", boxShadow: "0 4px 20px rgba(34,197,94,0.35)", transform: "scale(1.1) translateY(-4px)" } as React.CSSProperties : {} as React.CSSProperties,
   };
 
   // Before mount: always render spinner (server and client match)
@@ -376,8 +392,8 @@ export default function RoomPage() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🃏</span>
             <div>
-              <h1 className="text-white font-bold text-lg leading-tight">{room.name}</h1>
-              <p className="text-slate-400 text-xs">Playing as <span className="text-indigo-400 font-medium">{userName}</span></p>
+              <h1 className="text-white font-bold text-lg leading-tight" style={LT.headerTitle}>{room.name}</h1>
+              <p className="text-slate-400 text-xs" style={LT.headerSubtitle}>Playing as <span className="text-indigo-400 font-medium" style={LT.headerAccent}>{userName}</span></p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -543,7 +559,7 @@ export default function RoomPage() {
         {/* Participants — Poker Table Layout */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-slate-400 tracking-wide">
+            <h2 className="text-sm font-semibold text-slate-400 tracking-wide" style={LT.sectionLabel}>
               Participants — {votedCount}/{voters.length} voted
             </h2>
             {allVoted && !room.revealed && (
@@ -669,28 +685,32 @@ export default function RoomPage() {
         {/* Voting Cards */}
         {!isObserver && (
           <div>
-            <h2 className="text-sm font-semibold text-slate-400 tracking-wide mb-4">
+            <h2 className="text-sm font-semibold text-slate-400 tracking-wide mb-4" style={LT.sectionLabel}>
               {room.revealed ? "Round Complete" : "Cast Your Vote"}
             </h2>
             <div className="flex flex-wrap gap-3 justify-center">
-              {FIBONACCI_CARDS.map((card) => (
+              {FIBONACCI_CARDS.map((card) => {
+                const isSelected = myVote === card && !room.revealed;
+                const cardStyle = isLight
+                  ? (isSelected ? LT.voteCardSel : LT.voteCardDef)
+                  : (isSelected ? DT.voteCardSel : DT.voteCardDef);
+                return (
                 <button
                   key={card}
                   onClick={() => vote(card)}
                   disabled={room.revealed}
-                  style={myVote === card && !room.revealed ? LT.voteCardSel : LT.voteCardDef}
+                  style={cardStyle}
                   className={`
-                    w-16 h-24 rounded-xl text-xl font-bold border-2 transition-all transform
-                    ${room.revealed ? "opacity-50 cursor-not-allowed" : "hover:scale-110 hover:-translate-y-1 cursor-pointer"}
-                    ${myVote === card && !room.revealed
-                      ? "bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-500/30 scale-110 -translate-y-1"
-                      : "bg-slate-800 border-slate-600 text-slate-200 hover:border-indigo-500 hover:bg-slate-700"
-                    }
+                    w-16 h-24 rounded-xl text-xl font-bold border-2 transition-all duration-150
+                    ${room.revealed ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-105 hover:-translate-y-1"}
+                    ${!isLight && !isSelected ? "hover:border-emerald-400/60 hover:bg-white/10" : ""}
+                    ${!isLight && isSelected ? "scale-110 -translate-y-1" : ""}
                   `}
                 >
                   {card}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -702,7 +722,7 @@ export default function RoomPage() {
               <button
                 onClick={reveal}
                 disabled={votedCount === 0}
-                style={isLight ? {background: votedCount === 0 ? '#94a3b8' : '#1a6b3a', color: '#fff'} : {}}
+                style={isLight ? (votedCount === 0 ? LT.accentBtnDis : LT.accentBtn) : {}}
                 className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold px-8 py-3 rounded-xl transition text-lg"
               >
                 Reveal Cards 👁
@@ -713,7 +733,7 @@ export default function RoomPage() {
                   room.ticket_index < room.tickets.length - 1 ? (
                     <button
                       onClick={nextTicket}
-                      style={isLight ? {background:'#1a6b3a', color:'#fff'} : {}}
+                      style={isLight ? LT.accentBtn : {}}
                       className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition text-lg"
                     >
                       Next Ticket →
@@ -724,6 +744,7 @@ export default function RoomPage() {
                 ) : (
                   <button
                     onClick={reset}
+                    style={isLight ? LT.accentBtn : {}}
                     className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3 rounded-xl transition text-lg"
                   >
                     New Round 🔄
@@ -732,7 +753,7 @@ export default function RoomPage() {
               </div>
             )
           ) : (
-            <p className="text-slate-500 text-sm italic">
+            <p className="text-slate-500 text-sm italic" style={LT.mutedText}>
               {room.revealed ? "Waiting for host to start next round..." : "Waiting for host to reveal..."}
             </p>
           )}
