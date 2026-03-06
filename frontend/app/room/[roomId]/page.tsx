@@ -63,13 +63,24 @@ export default function RoomPage() {
   const roomId = (params.roomId as string).toUpperCase();
 
   // Resolve name: URL param > sessionStorage > prompt
+  // NOTE: sessionStorage is read in useEffect only (never during SSR) to avoid hydration mismatch
   const nameFromUrl = searchParams.get("name");
-  const nameFromStorage = typeof window !== "undefined" ? sessionStorage.getItem("poker_name") : null;
-  const initialName = nameFromUrl || nameFromStorage || "";
+  const [userName, setUserName] = useState(nameFromUrl || "");
+  const [nameReady, setNameReady] = useState(!!nameFromUrl);
+  const [nameInput, setNameInput] = useState(nameFromUrl || "");
 
-  const [userName, setUserName] = useState(initialName);
-  const [nameReady, setNameReady] = useState(!!initialName);
-  const [nameInput, setNameInput] = useState(initialName);
+  // Populate name from sessionStorage client-side after mount
+  useEffect(() => {
+    if (!nameFromUrl) {
+      const stored = sessionStorage.getItem("poker_name");
+      if (stored) {
+        setUserName(stored);
+        setNameInput(stored);
+        setNameReady(true);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [userId] = useState(() => {
     if (typeof window !== "undefined") {
