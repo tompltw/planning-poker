@@ -290,8 +290,11 @@ export default function RoomPage() {
   };
   // Dark theme inline styles (supplement Tailwind for premium glass look)
   const DT = {
-    voteCardDef: !isLight ? { background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.14)", color: "#e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" } as React.CSSProperties : {} as React.CSSProperties,
-    voteCardSel: !isLight ? { background: "rgba(34,197,94,0.18)", borderColor: "#22c55e", color: "#ffffff", boxShadow: "0 4px 20px rgba(34,197,94,0.35)", transform: "scale(1.1) translateY(-4px)" } as React.CSSProperties : {} as React.CSSProperties,
+    voteCardDef:  !isLight ? { background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.14)", color: "#e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" } as React.CSSProperties : {} as React.CSSProperties,
+    voteCardSel:  !isLight ? { background: "rgba(34,197,94,0.18)", borderColor: "#22c55e", color: "#ffffff", boxShadow: "0 4px 20px rgba(34,197,94,0.35)", transform: "scale(1.1) translateY(-4px)" } as React.CSSProperties : {} as React.CSSProperties,
+    accentBtn:    !isLight ? { background: "#16a34a", color: "#ffffff", borderRadius: "10px", border: "none", fontWeight: "bold" } as React.CSSProperties : {} as React.CSSProperties,
+    accentBtnDis: !isLight ? { background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.2)", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.08)", cursor: "not-allowed" } as React.CSSProperties : {} as React.CSSProperties,
+    secondaryBtn: !isLight ? { background: "rgba(255,255,255,0.08)", color: "#94a3b8", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)" } as React.CSSProperties : {} as React.CSSProperties,
   };
 
   // Before mount: always render spinner (server and client match)
@@ -394,7 +397,7 @@ export default function RoomPage() {
             <span className="text-2xl">🃏</span>
             <div>
               <h1 className="text-white font-bold text-lg leading-tight" style={LT.headerTitle}>{room.name}</h1>
-              <p className="text-slate-400 text-xs" style={LT.headerSubtitle}>Playing as <span className="text-indigo-400 font-medium" style={LT.headerAccent}>{userName}</span></p>
+              <p className="text-slate-400 text-xs" style={LT.headerSubtitle}>Playing as <span className="font-medium" style={isLight ? {color:"#16a34a"} : {color:"#22c55e"}}>{userName}</span></p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -432,7 +435,7 @@ export default function RoomPage() {
             {room.host_id === userId && room.tickets.length === 0 && (
               <button
                 onClick={() => setShowTicketInput(v => !v)}
-                className="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-500/40 px-2 py-1 rounded-lg"
+                className="text-xs text-emerald-400 hover:text-emerald-300 border border-emerald-500/40 px-2 py-1 rounded-lg"
               >
                 {showTicketInput ? "Cancel" : "📋 Load Backlog"}
               </button>
@@ -463,7 +466,12 @@ export default function RoomPage() {
                 onChange={(e) => setTicketInput(e.target.value)}
               />
               <div className="flex gap-2 mt-2">
-                <button onClick={loadTickets} disabled={!ticketInput.trim()} className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-sm px-4 py-2 rounded-xl transition">
+                <button
+                  onClick={loadTickets}
+                  disabled={!ticketInput.trim()}
+                  style={isLight ? (!ticketInput.trim() ? LT.accentBtnDis : LT.accentBtn) : (!ticketInput.trim() ? DT.accentBtnDis : DT.accentBtn)}
+                  className="text-white text-sm px-4 py-2 rounded-xl transition disabled:cursor-not-allowed"
+                >
                   Load Tickets
                 </button>
                 <button onClick={() => setShowTicketInput(false)} className="text-slate-400 hover:text-white text-sm px-3 py-2 rounded-xl border border-slate-600">
@@ -494,7 +502,7 @@ export default function RoomPage() {
 
           {/* Current ticket display */}
           {room.story && (
-            <p className="text-indigo-300 text-sm mt-2 font-medium" style={LT.headerAccent}>📌 {room.story}</p>
+            <p className="text-sm mt-2 font-medium" style={isLight ? {color:"#16a34a"} : {color:"#6ee7a0"}}>📌 {room.story}</p>
           )}
 
           {/* Ticket backlog list */}
@@ -508,16 +516,16 @@ export default function RoomPage() {
                     onClick={() => { if (room.host_id === userId && i !== room.ticket_index) gotoTicket(i); }}
                     className={`flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm transition ${
                       i === room.ticket_index
-                        ? "bg-indigo-600/20 border border-indigo-500/40 text-white"
+                        ? "bg-emerald-600/20 border border-emerald-500/40 text-white"
                         : i < room.ticket_index
                         ? `text-slate-500 bg-slate-800/30 ${room.host_id === userId ? "cursor-pointer hover:bg-slate-700/50 hover:text-slate-300 hover:border hover:border-slate-600" : ""}`
-                        : `text-slate-300 bg-slate-800/20 ${room.host_id === userId ? "cursor-pointer hover:bg-indigo-900/20 hover:border hover:border-indigo-700/40" : ""}`
+                        : `text-slate-300 bg-slate-800/20 ${room.host_id === userId ? "cursor-pointer hover:bg-emerald-900/20 hover:border hover:border-emerald-700/40" : ""}`
                     }`}
                     title={room.host_id === userId && i !== room.ticket_index ? "Click to jump to this ticket" : undefined}
                   >
                     <span className="flex items-center gap-2 truncate">
                       <span className="text-slate-500 text-xs w-5 shrink-0">{i + 1}.</span>
-                      {i === room.ticket_index && <span className="text-indigo-400">▶</span>}
+                      {i === room.ticket_index && <span className="text-emerald-400">▶</span>}
                       {i !== room.ticket_index && t.estimate && <span className="text-green-500">✓</span>}
                       <span className="truncate">{t.title}</span>
                     </span>
@@ -585,11 +593,11 @@ export default function RoomPage() {
                   className={`w-12 h-16 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all backdrop-blur-sm
                   ${isLight
                     ? (p.id === userId ? "border-green-500 shadow-md" : "border-slate-300")
-                    : (p.id === userId ? "border-indigo-400 shadow-lg shadow-indigo-500/30" : "border-white/20")}
+                    : (p.id === userId ? "border-emerald-500/60 shadow-lg shadow-emerald-500/20" : "border-white/20")}
                   ${p.vote === null
                     ? (isLight ? "" : "bg-white/8")
                     : p.vote === "voted"
-                    ? (isLight ? "" : "bg-indigo-500/20 border-indigo-400/50 shadow shadow-indigo-500/25")
+                    ? (isLight ? "" : "bg-emerald-500/15 border-emerald-400/50 shadow shadow-emerald-500/20")
                     : "bg-white/12 border-white/30"}`}>
                   {p.vote === null && <span className={isLight ? "text-slate-400 text-xl font-bold" : "text-slate-500 text-xl"}>?</span>}
                   {p.vote === "voted" && <span className="text-lg">🂠</span>}
@@ -602,7 +610,7 @@ export default function RoomPage() {
                   <p className="text-xs font-medium truncate max-w-[56px]" style={isLight ? {color:"#334155"} : {color:"#cbd5e1"}}>
                     {room.host_id === p.id && <span className="text-yellow-500">👑</span>}{p.name}
                   </p>
-                  {p.id === userId && <p className="text-xs font-semibold" style={LT.headerAccent || {color:"#818cf8"}}>you</p>}
+                  {p.id === userId && <p className="text-xs font-semibold" style={isLight ? {color:"#16a34a"} : {color:"#22c55e"}}>you</p>}
                   {p.is_observer && <p className="text-xs text-slate-500">👁</p>}
                 </div>
               </div>
@@ -639,7 +647,7 @@ export default function RoomPage() {
             {room.stats && (
               <div className="grid grid-cols-3 gap-4 text-center mb-6">
                 <div>
-                  <p className="text-3xl font-bold text-indigo-400">{room.stats.average}</p>
+                  <p className="text-3xl font-bold" style={isLight ? {color:"#16a34a"} : {color:"#22c55e"}}>{room.stats.average}</p>
                   <p className="text-xs text-slate-400 mt-1">Average</p>
                 </div>
                 <div>
@@ -725,8 +733,8 @@ export default function RoomPage() {
               <button
                 onClick={reveal}
                 disabled={votedCount === 0}
-                style={isLight ? (votedCount === 0 ? LT.accentBtnDis : LT.accentBtn) : {}}
-                className={`font-bold px-8 py-3 rounded-xl transition text-lg ${isLight ? "" : "bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40"} disabled:cursor-not-allowed text-white`}
+                style={isLight ? (votedCount === 0 ? LT.accentBtnDis : LT.accentBtn) : (votedCount === 0 ? DT.accentBtnDis : DT.accentBtn)}
+                className="font-bold px-8 py-3 rounded-xl transition text-lg disabled:cursor-not-allowed text-white"
               >
                 Reveal Cards 👁
               </button>
@@ -736,8 +744,8 @@ export default function RoomPage() {
                   room.ticket_index < room.tickets.length - 1 ? (
                     <button
                       onClick={nextTicket}
-                      style={isLight ? LT.accentBtn : {}}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition text-lg"
+                      style={isLight ? LT.accentBtn : DT.accentBtn}
+                      className="text-white font-bold px-8 py-3 rounded-xl transition text-lg"
                     >
                       Next Ticket →
                     </button>
@@ -747,8 +755,8 @@ export default function RoomPage() {
                 ) : (
                   <button
                     onClick={reset}
-                    style={isLight ? LT.accentBtn : {}}
-                    className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3 rounded-xl transition text-lg"
+                    style={isLight ? LT.accentBtn : DT.accentBtn}
+                    className="text-white font-bold px-8 py-3 rounded-xl transition text-lg"
                   >
                     New Round 🔄
                   </button>
