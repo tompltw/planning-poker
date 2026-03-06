@@ -24,6 +24,13 @@ type Stats = {
   min: number;
   max: number;
   consensus: boolean;
+  consensus_value: string | null;
+};
+
+type Ticket = {
+  id: string;
+  title: string;
+  estimate: string | null;
 };
 
 type RoomState = {
@@ -34,6 +41,8 @@ type RoomState = {
   host_id: string | null;
   participants: Participant[];
   stats: Stats | null;
+  tickets: Ticket[];
+  ticket_index: number;
 };
 
 function getVoteColor(vote: string | null, revealed: boolean): string {
@@ -79,6 +88,11 @@ export default function RoomPage() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [joined, setJoined] = useState(false);
+  // Ticket backlog
+  const [ticketInput, setTicketInput] = useState("");
+  const [showTicketInput, setShowTicketInput] = useState(false);
+  const [editingEstimate, setEditingEstimate] = useState<string | null>(null); // ticket id
+  const [estimateEdit, setEstimateEdit] = useState("");
 
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -159,6 +173,22 @@ export default function RoomPage() {
   };
 
   const setStory = () => send({ type: "set_story", story: storyInput });
+
+  const loadTickets = () => {
+    const titles = ticketInput.split("\n").filter(t => t.trim());
+    if (!titles.length) return;
+    send({ type: "load_tickets", tickets: titles });
+    setShowTicketInput(false);
+    setTicketInput("");
+  };
+
+  const nextTicket = () => send({ type: "next_ticket" });
+
+  const saveEstimate = (ticketId: string) => {
+    send({ type: "set_estimate", ticket_id: ticketId, estimate: estimateEdit });
+    setEditingEstimate(null);
+    setEstimateEdit("");
+  };
 
   const copyToClipboard = (text: string) => {
     if (navigator.clipboard) {
@@ -298,30 +328,130 @@ export default function RoomPage() {
       </header>
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
-        {/* Story Input — host only */}
+        {/* Story / Ticket Panel */}
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-5">
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Current Story / Ticket</label>
-          {room.host_id === userId ? (
-            <div className="flex gap-3">
-              <input
-                className="flex-1 bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
-                placeholder="Describe the story or paste a ticket ID..."
-                value={storyInput}
-                onChange={(e) => setStoryInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && setStory()}
-              />
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              {room.tickets.length > 0 ? `Ticket ${room.ticket_index + 1} of ${room.tickets.length}` : "Current Story / Ticket"}
+            </label>
+            {room.host_id === userId && room.tickets.length === 0 && (
               <button
-                onClick={setStory}
-                className="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2.5 rounded-xl border border-slate-600 transition"
+                onClick={() => setShowTicketInput(v => !v)}
+                className="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-500/40 px-2 py-1 rounded-lg"
               >
-                Set
+                {showTicketInput ? "Cancel" : "📋 Load Backlog"}
               </button>
+            )}
+            {room.host_id === userId && room.tickets.length > 0 && (
+              <button
+                onClick={() => { setShowTicketInput(true); }}
+                className="text-xs text-slate-400 hover:text-slate-300 border border-slate-600 px-2 py-1 rounded-lg"
+              >
+                ✏️ Replace Backlog
+              </button>
+            )}
+          </div>
+
+          {/* Ticket list input (host only) */}
+          {showTicketInput && room.host_id === userId && (
+            <div className="mb-4">
+              <textarea
+                autoFocus
+                className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm font-mono"
+                rows={5}
+                placeholder={"One ticket per line:\nUSER-101 Add login page\nUSER-102 Fix checkout bug\nUSER-103 Dark mode"}
+                value={ticketInput}
+                onChange={(e) => setTicketInput(e.target.value)}
+              />
+              <div className="flex gap-2 mt-2">
+                <button onClick={loadTickets} disabled={!ticketInput.trim()} className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-sm px-4 py-2 rounded-xl transition">
+                  Load Tickets
+                </button>
+                <button onClick={() => setShowTicketInput(false)} className="text-slate-400 hover:text-white text-sm px-3 py-2 rounded-xl border border-slate-600">
+                  Cancel
+                </button>
+              </div>
             </div>
-          ) : (
-            <p className="text-slate-500 text-sm italic">Only the host can set the story.</p>
           )}
+
+          {/* Single story input (no backlog) */}
+          {room.tickets.length === 0 && !showTicketInput && (
+            room.host_id === userId ? (
+              <div className="flex gap-3">
+                <input
+                  className="flex-1 bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
+                  placeholder="Describe the story or paste a ticket ID..."
+                  value={storyInput}
+                  onChange={(e) => setStoryInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && setStory()}
+                />
+                <button onClick={setStory} className="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2.5 rounded-xl border border-slate-600 transition">Set</button>
+              </div>
+            ) : (
+              <p className="text-slate-500 text-sm italic">Only the host can set the story.</p>
+            )
+          )}
+
+          {/* Current ticket display */}
           {room.story && (
             <p className="text-indigo-300 text-sm mt-2 font-medium">📌 {room.story}</p>
+          )}
+
+          {/* Ticket backlog list */}
+          {room.tickets.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Backlog</p>
+              <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
+                {room.tickets.map((t, i) => (
+                  <div
+                    key={t.id}
+                    className={`flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm ${
+                      i === room.ticket_index
+                        ? "bg-indigo-600/20 border border-indigo-500/40 text-white"
+                        : i < room.ticket_index
+                        ? "text-slate-500 bg-slate-800/30"
+                        : "text-slate-300 bg-slate-800/20"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2 truncate">
+                      <span className="text-slate-500 text-xs w-5 shrink-0">{i + 1}.</span>
+                      {i === room.ticket_index && <span className="text-indigo-400">▶</span>}
+                      {i < room.ticket_index && <span className="text-green-500">✓</span>}
+                      <span className="truncate">{t.title}</span>
+                    </span>
+                    <span className="shrink-0">
+                      {editingEstimate === t.id && room.host_id === userId ? (
+                        <span className="flex items-center gap-1">
+                          <input
+                            autoFocus
+                            className="w-14 bg-slate-700 border border-slate-500 rounded px-1 py-0.5 text-white text-xs text-center"
+                            value={estimateEdit}
+                            onChange={(e) => setEstimateEdit(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") saveEstimate(t.id); if (e.key === "Escape") setEditingEstimate(null); }}
+                          />
+                          <button onClick={() => saveEstimate(t.id)} className="text-green-400 hover:text-green-300 text-xs">✓</button>
+                        </span>
+                      ) : (
+                        <span
+                          className={`font-bold text-xs px-2 py-0.5 rounded ${
+                            t.estimate ? "bg-green-900/40 text-green-300 cursor-pointer hover:bg-green-900/60" : "text-slate-600"
+                          }`}
+                          title={room.host_id === userId ? "Click to edit" : undefined}
+                          onClick={() => {
+                            if (room.host_id === userId) {
+                              setEditingEstimate(t.id);
+                              setEstimateEdit(t.estimate || "");
+                            }
+                          }}
+                        >
+                          {t.estimate ?? "—"}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
@@ -458,12 +588,27 @@ export default function RoomPage() {
                 Reveal Cards 👁
               </button>
             ) : (
-              <button
-                onClick={reset}
-                className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3 rounded-xl transition text-lg"
-              >
-                New Round 🔄
-              </button>
+              <div className="flex gap-3">
+                {room.tickets.length > 0 ? (
+                  room.ticket_index < room.tickets.length - 1 ? (
+                    <button
+                      onClick={nextTicket}
+                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition text-lg"
+                    >
+                      Next Ticket →
+                    </button>
+                  ) : (
+                    <span className="text-green-400 font-bold py-3 px-4">🎉 All tickets estimated!</span>
+                  )
+                ) : (
+                  <button
+                    onClick={reset}
+                    className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3 rounded-xl transition text-lg"
+                  >
+                    New Round 🔄
+                  </button>
+                )}
+              </div>
             )
           ) : (
             <p className="text-slate-500 text-sm italic">

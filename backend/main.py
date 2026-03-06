@@ -22,11 +22,14 @@ class Room:
         self.id = room_id
         self.name = name
         self.created_by = created_by
-        self.host_id: Optional[str] = None  # set when first user joins
-        self.participants: Dict[str, dict] = {}  # user_id -> {name, vote, is_observer}
+        self.host_id: Optional[str] = None
+        self.participants: Dict[str, dict] = {}
         self.revealed = False
         self.story = ""
         self.connections: Dict[str, WebSocket] = {}
+        # Ticket backlog
+        self.tickets: List[dict] = []  # [{id, title, estimate}]
+        self.ticket_index: int = -1    # -1 = no backlog loaded
 
     def to_dict(self):
         return {
@@ -45,6 +48,8 @@ class Room:
                 for uid, p in self.participants.items()
             ],
             "stats": self.get_stats() if self.revealed else None,
+            "tickets": self.tickets,
+            "ticket_index": self.ticket_index,
         }
 
     def get_stats(self):
@@ -60,12 +65,30 @@ class Room:
                 pass
         if not numeric:
             return None
+        avg = round(sum(numeric) / len(numeric), 1)
         return {
-            "average": round(sum(numeric) / len(numeric), 1),
+            "average": avg,
             "min": min(numeric),
             "max": max(numeric),
             "consensus": len(set(numeric)) == 1,
+            "consensus_value": str(int(numeric[0])) if len(set(numeric)) == 1 and numeric[0] == int(numeric[0]) else str(numeric[0]) if len(set(numeric)) == 1 else None,
         }
+
+    def save_current_estimate(self):
+        """Auto-save estimate for current ticket based on votes."""
+        if self.ticket_index < 0 or self.ticket_index >= len(self.tickets):
+            return
+        stats = self.get_stats()
+        if stats is None:
+            return
+        # Only save if not already manually set
+        ticket = self.tickets[self.ticket_index]
+        if ticket.get("estimate") is None:
+            if stats["consensus"] and stats["consensus_value"]:
+                ticket["estimate"] = stats["consensus_value"]
+            else:
+                avg = stats["average"]
+                ticket["estimate"] = str(int(avg)) if avg == int(avg) else str(avg)
 
 
 # In-memory store
@@ -76,10 +99,6 @@ rooms: Dict[str, Room] = {}
 class CreateRoomRequest(BaseModel):
     name: str
     created_by: str
-
-class JoinRoomRequest(BaseModel):
-    user_name: str
-    is_observer: bool = False
 
 @app.post("/api/rooms")
 def create_room(req: CreateRoomRequest):
@@ -125,11 +144,8 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: str):
         return
 
     room.connections[user_id] = websocket
-
-    # Send current state
     await websocket.send_text(json.dumps({"type": "state", "room": room.to_dict()}))
 
-    # Notify others
     if user_id in room.participants:
         await broadcast(room, {"type": "state", "room": room.to_dict()})
 
@@ -145,7 +161,6 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: str):
                     "vote": None,
                     "is_observer": msg.get("is_observer", False),
                 }
-                # First person to join becomes the host
                 if room.host_id is None:
                     room.host_id = user_id
                 await broadcast(room, {"type": "state", "room": room.to_dict()})
@@ -158,12 +173,13 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: str):
             elif event_type == "reveal":
                 if user_id == room.host_id:
                     room.revealed = True
+                    room.save_current_estimate()
                     await broadcast(room, {"type": "state", "room": room.to_dict()})
 
             elif event_type == "reset":
                 if user_id == room.host_id:
                     room.revealed = False
-                    room.story = msg.get("story", "")
+                    room.story = msg.get("story", room.story)
                     for p in room.participants.values():
                         p["vote"] = None
                     await broadcast(room, {"type": "state", "room": room.to_dict()})
@@ -171,6 +187,45 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: str):
             elif event_type == "set_story":
                 if user_id == room.host_id:
                     room.story = msg.get("story", "")
+                    await broadcast(room, {"type": "state", "room": room.to_dict()})
+
+            elif event_type == "load_tickets":
+                # Host loads a list of ticket titles
+                if user_id == room.host_id:
+                    titles = msg.get("tickets", [])
+                    room.tickets = [
+                        {"id": str(uuid.uuid4())[:8], "title": t.strip(), "estimate": None}
+                        for t in titles if t.strip()
+                    ]
+                    room.ticket_index = 0 if room.tickets else -1
+                    if room.tickets:
+                        room.story = room.tickets[0]["title"]
+                        room.revealed = False
+                        for p in room.participants.values():
+                            p["vote"] = None
+                    await broadcast(room, {"type": "state", "room": room.to_dict()})
+
+            elif event_type == "next_ticket":
+                # Host advances to next ticket
+                if user_id == room.host_id and room.ticket_index >= 0:
+                    next_idx = room.ticket_index + 1
+                    if next_idx < len(room.tickets):
+                        room.ticket_index = next_idx
+                        room.story = room.tickets[next_idx]["title"]
+                        room.revealed = False
+                        for p in room.participants.values():
+                            p["vote"] = None
+                        await broadcast(room, {"type": "state", "room": room.to_dict()})
+
+            elif event_type == "set_estimate":
+                # Host manually sets/overrides estimate for a ticket
+                if user_id == room.host_id:
+                    ticket_id = msg.get("ticket_id")
+                    estimate = msg.get("estimate", "")
+                    for t in room.tickets:
+                        if t["id"] == ticket_id:
+                            t["estimate"] = estimate if estimate else None
+                            break
                     await broadcast(room, {"type": "state", "room": room.to_dict()})
 
             elif event_type == "kick":
@@ -189,5 +244,4 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: str):
     except WebSocketDisconnect:
         room.connections.pop(user_id, None)
         if user_id in room.participants:
-            # Mark as disconnected but keep in list briefly
             await broadcast(room, {"type": "state", "room": room.to_dict()})
