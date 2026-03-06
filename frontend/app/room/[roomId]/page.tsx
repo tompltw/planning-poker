@@ -12,6 +12,15 @@ function getWsBase(): string {
 
 const FIBONACCI_CARDS = ["0", "1", "2", "3", "5", "8", "13", "21", "?", "☕"];
 
+const THEMES = {
+  dark:   { name: "Dark",   swatch: "#1e293b", page: "bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950",  header: "bg-slate-900/60 border-slate-700/50",  table: "from-green-900/60 to-green-950/80 border-green-700/50" },
+  ocean:  { name: "Ocean",  swatch: "#0c4a6e", page: "bg-gradient-to-br from-blue-950 via-blue-900 to-teal-950",      header: "bg-blue-950/60 border-blue-700/50",    table: "from-teal-800/60 to-teal-950/80 border-teal-600/50" },
+  forest: { name: "Forest", swatch: "#14532d", page: "bg-gradient-to-br from-emerald-950 via-emerald-900 to-green-950", header: "bg-emerald-950/60 border-emerald-700/50", table: "from-emerald-700/60 to-emerald-950/80 border-emerald-500/50" },
+  sunset: { name: "Sunset", swatch: "#7c2d12", page: "bg-gradient-to-br from-orange-950 via-rose-900 to-orange-950",  header: "bg-orange-950/60 border-orange-800/50", table: "from-amber-800/60 to-orange-950/80 border-amber-600/50" },
+  nebula: { name: "Nebula", swatch: "#4c1d95", page: "bg-gradient-to-br from-purple-950 via-violet-900 to-purple-950", header: "bg-purple-950/60 border-purple-700/50",  table: "from-violet-900/60 to-purple-950/80 border-violet-600/50" },
+} as const;
+type ThemeKey = keyof typeof THEMES;
+
 type Participant = {
   id: string;
   name: string;
@@ -105,9 +114,17 @@ export default function RoomPage() {
   const [editingEstimate, setEditingEstimate] = useState<string | null>(null); // ticket id
   const [estimateEdit, setEstimateEdit] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<ThemeKey>("dark");
 
   // Mark mounted — guarantees server and client initial render are identical (both show spinner)
   useEffect(() => { setMounted(true); }, []);
+
+  // Load + persist theme
+  useEffect(() => {
+    const saved = localStorage.getItem("poker_theme") as ThemeKey | null;
+    if (saved && THEMES[saved]) setTheme(saved);
+  }, []);
+  const applyTheme = (t: ThemeKey) => { setTheme(t); localStorage.setItem("poker_theme", t); };
 
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -328,10 +345,12 @@ export default function RoomPage() {
     );
   }
 
+  const T = THEMES[theme];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 flex flex-col">
+    <div className={`min-h-screen ${T.page} flex flex-col`}>
       {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/60 backdrop-blur px-6 py-4">
+      <header className={`border-b ${T.header} backdrop-blur px-6 py-4`}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">🃏</span>
@@ -352,6 +371,18 @@ export default function RoomPage() {
             <button onClick={copyLink} className="text-slate-400 hover:text-white text-xs px-2 py-1 bg-slate-800 rounded-lg border border-slate-700">
               Share Link
             </button>
+            {/* Theme picker */}
+            <div className="flex items-center gap-1 ml-1">
+              {(Object.entries(THEMES) as [ThemeKey, typeof THEMES[ThemeKey]][]).map(([key, t]) => (
+                <button
+                  key={key}
+                  title={t.name}
+                  onClick={() => applyTheme(key)}
+                  className={`w-5 h-5 rounded-full border-2 transition ${theme === key ? "border-white scale-110" : "border-transparent hover:border-white/50"}`}
+                  style={{ backgroundColor: t.swatch }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </header>
@@ -541,7 +572,7 @@ export default function RoomPage() {
                   {topRow.map(renderSeat)}
                 </div>
                 {/* Oval table */}
-                <div className="w-full max-w-lg bg-gradient-to-b from-green-900/60 to-green-950/80 border-4 border-green-700/50 rounded-3xl h-24 flex items-center justify-center shadow-inner shadow-green-900/50 px-8">
+                <div className={`w-full max-w-lg bg-gradient-to-b ${T.table} border-4 rounded-3xl h-24 flex items-center justify-center shadow-inner px-8`}>
                   <p className="text-slate-300/80 text-xs text-center truncate max-w-[280px]">
                     {room.story || (room.tickets.length > 0 && room.ticket_index >= 0 ? room.tickets[room.ticket_index]?.title : "") || "🃏 Waiting for story…"}
                   </p>
