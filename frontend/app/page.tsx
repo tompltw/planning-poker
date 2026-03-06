@@ -30,7 +30,7 @@ export default function Home() {
       const data = await res.json();
       // Store name in session
       sessionStorage.setItem("poker_name", name);
-      router.push(`/room/${data.room_id}?name=${encodeURIComponent(name)}`);
+      router.push(`/room/${data.room_id}`);
     } catch (e) {
       setError("Failed to create room. Is the server running?");
     }
@@ -40,7 +40,7 @@ export default function Home() {
   const joinRoom = () => {
     if (!name.trim() || !joinCode.trim()) return;
     sessionStorage.setItem("poker_name", name);
-    router.push(`/room/${joinCode.toUpperCase().trim()}?name=${encodeURIComponent(name)}`);
+    router.push(`/room/${joinCode.toUpperCase().trim()}`);
   };
 
   return (
